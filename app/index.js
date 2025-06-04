@@ -7,14 +7,32 @@ const register = prom.register;
 var app = express();
 
 const client = require('prom-client');
-const counter = new client.Counter({
+
+const counter = new prom.Counter({
   name: 'class_request_total',
   help: 'Request Counter',
+  labelNames: ['statusCode']
+});
+
+const gauge = new prom.Gauge({ 
+  name: 'class_free_bytes', 
+  help: 'Gauge example' 
+});
+
+const histogram = new prom.Histogram({
+  name: 'class_request_time_seconds',
+  help: 'APIs Response time',
+  buckets: [0.1, 0.2, 0.3, 0.4, 0.5],
 });
 
 
 app.get('/', function(req, res){
-    counter.inc();
+    counter.labels('200').inc();
+    counter.labels('300').inc();
+    counter.labels('400').inc();
+    gauge.set(10*Math.random());
+    histogram.observe(Math.random());
+
     res.send('Hello World!');
 });
 
