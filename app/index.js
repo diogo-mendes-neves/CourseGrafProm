@@ -25,13 +25,22 @@ const histogram = new prom.Histogram({
   buckets: [0.1, 0.2, 0.3, 0.4, 0.5],
 });
 
+const summary = new prom.Summary({
+  name: 'class_summary_request_time_seconds',
+  help: 'API request time',
+  percentiles: [0.5, 0.9, 0.99],
+});
+
 
 app.get('/', function(req, res){
     counter.labels('200').inc();
     counter.labels('300').inc();
     counter.labels('400').inc();
     gauge.set(10*Math.random());
-    histogram.observe(Math.random());
+    const time = Math.random();
+    histogram.observe(time);
+    summary.observe(time);
+
 
     res.send('Hello World!');
 });
